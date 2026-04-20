@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta CNPJ + IE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<main>
+    <div class="top">
+      <button class="menu-hamburguer">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <h1>Consulta CNPJ + IE</h1>
+      <div class="spaco-horizontal"></div>
+    </div>
+</main>
+
+<div id="menu-lateral" class="menu-lateral">
+    <button class="fechar-menu">&times;</button>
+    <ul id="menu-lista">
+      <li><b href="#consultar">Menu</b></li>
+      <li><c></c></li>
+      <li id="consultar"><a href="#">Consultar CNPJ</a></li>
+      <li id="outra-tela"><a href="#">Minúsculo ➡️ Maiúsculo</a></li>
+    </ul>
+</div>
+
+
+<div id="tela-consulta">
+<div class="buscador">
+    <FORM class="campo" ID="FORM">
+      <input type="text" id="cnpj" placeholder="Digite o CNPJ">
+      <button type="submit">Consultar</button> <!-- onclick="consultarCNPJ()" -->
+      <button onclick="copiarCNPJ()" class="copiar-cnpj" type="button">Copiar CNPJ</button>
+      <div>
+      <button onclick="limparTudo()" class="limpar-cnpj">Limpar</button>
+      </div>
+    </FORM>
+</div>
+  <div id="resultado"></div>
+</div>
+
+
+  
+  <div class="rodape"></div>
+  <footer>Desenvolvido por Rhuan Recco Agostinho</footer>
+
+
+  
+
+
+
+<!-- Outra Tela -->
+<div id="tela-outra" class="outra-tela" style="display:none;">
+  <div class="quadrado-esquerda">
+    <textarea id="texto-esquerda" placeholder="Digite o texto..."></textarea>
+  </div>
+  <div class="quadrado-direita">
+    <textarea id="texto-direita" readonly placeholder="Conversão..."></textarea>
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
+
+
+
