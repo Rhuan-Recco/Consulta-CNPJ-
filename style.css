@@ -242,7 +242,7 @@ h1 {
   left: -300px; /* escondido inicialmente */
   width: 250px;
   height: 100%;
-  background-color: #333;
+  background-color: #000131;
   color: #fff;
   transition: left 0.5s ease;
   padding: 20px;
@@ -259,11 +259,14 @@ h1 {
 }
 
 .menu-lateral ul li c {
+  margin-left: -20px;
    margin-top: 20px;
    display: flex;
    background-color: currentColor;
-   width: 107%;
+   width: 116% !important;
    height: 1px;
+   align-items: left;
+   justify-content: center;
 }
 
 .menu-lateral ul {
@@ -272,17 +275,31 @@ h1 {
   padding: 0;
 }
 
-.menu-lateral ul li {
-  margin: 10px 0;
-}
-
 .menu-lateral ul li a {
+  background-color: #000131;
+  margin-left: -20px;
+  width: 116%;
+  height: 50px;
   border-color: #ff0000;
   border: 1px;
   display: flex;
   align-items: left;
   color: rgb(255, 255, 255);
   text-decoration: none;
+  align-items: center;
+}
+
+.menu-lateral ul li a:hover { 
+  background-color: rgba(0, 162, 255, 0.144);
+  color: rgba(255, 255, 255, 0.897); 
+}
+.menu-lateral ul li a:active {
+    background-color: rgb(0, 162, 255, 0.425);
+    color: #ffffffa9;
+}
+
+.prefixo {
+  color: transparent;
 }
 
 .menu-lateral.aberto {

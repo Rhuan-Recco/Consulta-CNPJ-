@@ -17,10 +17,15 @@ async function consultarCNPJ() {
     const resposta = await fetch(`https://publica.cnpj.ws/cnpj/${cnpj}`);
     const dados = await resposta.json();
 
-    if (!dados.razao_social) {
+    if (resposta.status == 200 && !dados.razao_social) {
       resultado.innerHTML = "CNPJ não encontrado.";
       return;
     }
+    else if (resposta.status == 429) {
+      resultado.innerHTML = "Limite de três requisições por minuto atingida! Aguarde um minuto para uma nova requisição.";
+      return;
+    }
+
 
     resultado.innerHTML = "";
     
