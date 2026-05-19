@@ -22,10 +22,35 @@ async function consultarCNPJ() {
       return;
     }
     else if (resposta.status == 429) {
-      resultado.innerHTML = "Limite de três requisições por minuto atingida! Aguarde um minuto para uma nova requisição.";
-      return;
+      resultado.innerHTML = "Limite de três consultas por minuto atingida! Aguarde um minuto consultar novamente.";
+
+
+      iniciarCronometro(resultado);
+  return;
     }
 
+    function iniciarCronometro(container) {
+  let tempo = 60; // segundos
+  const cronometro = document.createElement("div");
+  cronometro.style.fontWeight = "regular";
+  cronometro.style.color = "white";
+  cronometro.style.marginTop = "10px";
+  container.appendChild(cronometro);
+
+  cronometro.textContent = `Tempo restante: ${tempo}s`;
+
+  const intervalo = setInterval(() => {
+    tempo--;
+    cronometro.textContent = `Tempo restante: ${tempo}s`;
+
+    if (tempo <= 0) {
+      clearInterval(intervalo);
+      cronometro.style.fontWeight = "bold";
+      cronometro.textContent = "Você já pode consultar novamente!";
+      cronometro.style.color = "#1cc945";
+    }
+  }, 1000);
+}
 
     resultado.innerHTML = "";
     
