@@ -1,6 +1,13 @@
-document.getElementById('FORM').addEventListener('submit',(e)=> {
+let bloqueado = false; // flag global para bloquear consultas
+
+document.getElementById('FORM').addEventListener('submit',(e)=> {  
+  if (bloqueado) {
+    e.preventDefault(); // cancela envio
+    alert("Aguarde o cronômetro terminar para consultar novamente!");
+    return;
+  }
   e.preventDefault();
-  consultarCNPJ(); 
+  consultarCNPJ();  
 });
 
 async function consultarCNPJ() {
@@ -8,7 +15,7 @@ async function consultarCNPJ() {
   const resultado = document.getElementById("resultado");
 
   if(!cnpj){
-    resultadp.innerHTML = "";
+    resultado.innerHTML = "";
     return;
   }
   resultado.innerHTML = "Consultando...";
@@ -22,40 +29,15 @@ async function consultarCNPJ() {
       return;
     }
     else if (resposta.status == 429) {
-      resultado.innerHTML = "Limite de três consultas por minuto atingida! Aguarde um minuto consultar novamente.";
-
-
+      resultado.innerHTML = "Limite de três consultas por minuto atingido! Aguarde um minuto para consultar novamente.";
       iniciarCronometro(resultado);
-  return;
+      return;
     }
-
-    function iniciarCronometro(container) {
-  let tempo = 60; // segundos
-  const cronometro = document.createElement("div");
-  cronometro.style.fontWeight = "regular";
-  cronometro.style.color = "white";
-  cronometro.style.marginTop = "10px";
-  container.appendChild(cronometro);
-
-  cronometro.textContent = `Tempo restante: ${tempo}s`;
-
-  const intervalo = setInterval(() => {
-    tempo--;
-    cronometro.textContent = `Tempo restante: ${tempo}s`;
-
-    if (tempo <= 0) {
-      clearInterval(intervalo);
-      cronometro.style.fontWeight = "bold";
-      cronometro.textContent = "Você já pode consultar novamente!";
-      cronometro.style.color = "#1cc945";
-    }
-  }, 1000);
-}
 
     resultado.innerHTML = "";
     
     const campos = {
-      "Nome (empresarial)": dados.razao_social.toUpperCase(),
+      "Nome (empresarial)": dados.razao_social?.toUpperCase(),
       "Nome (fantasia)": dados.estabelecimento?.nome_fantasia?.toUpperCase(),
       "Status": dados.estabelecimento?.situacao_cadastral,
       "CEP": dados.estabelecimento?.cep,
@@ -64,8 +46,8 @@ async function consultarCNPJ() {
       "Bairro": dados.estabelecimento?.bairro?.toUpperCase(),
       "Cidade": dados.estabelecimento?.cidade?.nome?.toUpperCase(),
       "Estado": dados.estabelecimento?.estado?.sigla?.toUpperCase(),
-      "Telefone": dados.estabelecimento?.ddd1&&dados.estabelecimento?.telefone1 
-              ? `(${dados.estabelecimento.ddd1})${dados.estabelecimento.telefone1}` 
+      "Telefone": dados.estabelecimento?.ddd1&&dados.estabelecimento?.telefone1  
+              ? `(${dados.estabelecimento.ddd1})${dados.estabelecimento.telefone1}`  
               : null,
       "E-mail": dados.estabelecimento?.email,
       "Código Municipal": dados.estabelecimento?.cidade?.ibge_id
@@ -81,26 +63,25 @@ async function consultarCNPJ() {
         titulo.textContent = `${chave}:`;
 
         const dado = document.createElement("span");
-dado.className = "valor";
-dado.textContent = valor;
+        dado.className = "valor";
+        dado.textContent = valor;
 
-const botao = document.createElement("button");
-botao.textContent = "Copiar";
-botao.onclick = () => copiar(valor);
+        const botao = document.createElement("button");
+        botao.textContent = "Copiar";
+        botao.onclick = () => copiar(valor);
 
+        if (chave === "Status" && valor.toLowerCase() !== "ativa") {
+          botao.style.backgroundColor = "red";
+          botao.style.color = "white";
 
-if (chave === "Status" && valor.toLowerCase() !== "ativa") {
-  botao.style.backgroundColor = "red";
-  botao.style.color = "white";
+          const alerta = document.createElement("span");
+          alerta.textContent = "  ALERTA!";
+          alerta.style.color = "red";
+          alerta.style.fontWeight = "bold";
+          alerta.style.marginLeft = "10px";
 
-  const alerta = document.createElement("span");
-  alerta.textContent = "  ALERTA!";
-  alerta.style.color = "red";
-  alerta.style.fontWeight = "bold";
-  alerta.style.marginLeft = "10px";
-
-  dado.appendChild(alerta);
-}
+          dado.appendChild(alerta);
+        }
 
         linha.appendChild(titulo);
         linha.appendChild(dado);
@@ -109,55 +90,115 @@ if (chave === "Status" && valor.toLowerCase() !== "ativa") {
       }
     }
 
-if (dados.estabelecimento?.inscricoes_estaduais?.length > 0) {
-  dados.estabelecimento.inscricoes_estaduais.forEach((ie, index) => {
-    const linha = document.createElement("div");
-    linha.className = "linha";
+    if (dados.estabelecimento?.inscricoes_estaduais?.length > 0) {
+      dados.estabelecimento.inscricoes_estaduais.forEach((ie, index) => {
+        const linha = document.createElement("div");
+        linha.className = "linha";
 
-    const titulo = document.createElement("span");
-    titulo.className = "titulo";
-    titulo.textContent = `Inscrição Estadual ${index + 1}:`;
+        const titulo = document.createElement("span");
+        titulo.className = "titulo";
+        titulo.textContent = `Inscrição Estadual ${index + 1}:`;
 
-    const dado = document.createElement("span");
-    dado.className = "valor";
-    dado.textContent = `${ie.inscricao_estadual ?? ""} - ${ie.ativo ? "Ativa" : "Baixada"} - ${ie.estado?.sigla ?? ""}`;
+        const dado = document.createElement("span");
+        dado.className = "valor";
+        dado.textContent = `${ie.inscricao_estadual ?? ""} - ${ie.ativo ? "Ativa" : "Baixada"} - ${ie.estado?.sigla ?? ""}`;
 
-    if (ie.ativo && ie.estado?.sigla === dados.estabelecimento?.estado?.sigla) {
-      dado.classList.add("valor-ativo");
+        if (ie.ativo && ie.estado?.sigla === dados.estabelecimento?.estado?.sigla) {
+          dado.classList.add("valor-ativo");
+        }
+
+        linha.appendChild(titulo);
+        linha.appendChild(dado);
+
+        if (ie.ativo) {
+          const botao = document.createElement("button");
+          botao.textContent = "Copiar";
+
+          if (ie.estado?.sigla !== dados.estabelecimento?.estado?.sigla) {
+            botao.style.backgroundColor = "red";
+            botao.style.color = "white";
+            botao.onclick = () => {
+              copiar(ie.inscricao_estadual ?? "");
+              alert("Foi copiada a IE de outro estado!");
+            };
+          } else {
+            botao.style.backgroundColor = "#0066cc";
+            botao.style.color = "white";
+            botao.onclick = () => copiar(ie.inscricao_estadual ?? "");
+          }
+
+          linha.appendChild(botao);
+        }
+        resultado.appendChild(linha);
+      });
     }
-
-    linha.appendChild(titulo);
-    linha.appendChild(dado);
-
-    if (ie.ativo) {
-  const botao = document.createElement("button");
-  botao.textContent = "Copiar";
-
-  if (ie.estado?.sigla !== dados.estabelecimento?.estado?.sigla) {
-    botao.style.backgroundColor = "red";
-    botao.style.color = "white";
-    botao.onclick = () => {
-      copiar(ie.inscricao_estadual ?? "");
-      alert("Foi copiada a IE de outro estado!");
-    };
-  } else {
-    botao.style.backgroundColor = "#0066cc";
-    botao.style.color = "white";
-    botao.onclick = () => copiar(ie.inscricao_estadual ?? "");
-  }
-
-  linha.appendChild(botao);
-}
-    resultado.appendChild(linha);
-  });
-}
-
 
   } catch (erro) {
     resultado.innerHTML = "Erro ao consultar CNPJ.";
     console.log(erro);
   }
 }
+
+function iniciarCronometro(container) {
+  let tempo = 60; // segundos
+  bloqueado = true; // ativa bloqueio
+
+  const cronometro = document.createElement("div");
+  cronometro.style.fontWeight = "regular";
+  cronometro.style.color = "white";
+  cronometro.style.marginTop = "10px";
+  container.appendChild(cronometro);
+
+  // desabilita botão de submit
+  const botaoConsultar = document.querySelector("#FORM button[type='submit']");
+  if (botaoConsultar) {
+    botaoConsultar.disabled = true;
+    botaoConsultar.style.opacity = "0.5";
+
+  }
+
+  // Bloqueia atualização/fechamento da página
+  window.addEventListener("beforeunload", bloquearSaida);
+
+  cronometro.textContent = `Tempo restante: ${tempo}s`;
+
+  const intervalo = setInterval(() => {
+    tempo--;
+    cronometro.textContent = `Tempo restante: ${tempo}s`;
+
+    if (tempo <= 0) {
+      clearInterval(intervalo);
+      cronometro.style.fontWeight = "bold";
+      cronometro.textContent = "Você já pode consultar novamente!";
+      cronometro.style.color = "#1cc945";
+      bloqueado = false; // libera novamente
+
+      if (botaoConsultar) {
+        botaoConsultar.disabled = false;
+        botaoConsultar.style.opacity = "1";
+        botaoConsultar.style.cursor = "pointer";
+      }
+
+            // Libera atualização/fechamento da página
+      window.removeEventListener("beforeunload", bloquearSaida);
+
+    }
+  }, 1000);
+}
+
+function bloquearSaida(e) {
+  e.preventDefault();
+  e.returnValue = "Se sair, o cronômetro irá se perder e atrasará sua consulta!";
+}
+
+
+document.addEventListener("keydown", function(e) {
+  if (bloqueado && (e.key === "F5" || (e.ctrlKey && e.key === "r"))) {
+    e.preventDefault();
+    alert("Se atualizar a página o cronômetro irá se perder e atrasará sua consulta!");
+  }
+});
+
 
 function copiar(texto) {
   navigator.clipboard.writeText(texto).then(() => {
@@ -194,6 +235,7 @@ function copiarCNPJ() {
     alert("Digite um CNPJ antes de copiar!");
   }
 }
+
 
 const menuBtn = document.querySelector(".menu-hamburguer");
 const menuLateral = document.getElementById("menu-lateral");
